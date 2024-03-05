@@ -1,0 +1,9 @@
+{
+	"name": "LensKartADF",
+	"location": "southindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "4255938e-9e72-4f74-9445-e79bee3523c7",
+		"tenantId": "2800c0a0-70e9-49be-8733-faeaa6aced99"
+	}
+}
