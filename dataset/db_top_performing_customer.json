@@ -34,7 +34,7 @@
 		],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "top_performing_customer"
+			"table": "topPerformingCustomer"
 		}
 	}
 }
