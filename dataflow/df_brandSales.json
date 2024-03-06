@@ -3,11 +3,106 @@
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
-			"sources": [],
-			"sinks": [],
-			"transformations": [],
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_products_sql",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "db_transactions_sql",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable2",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "aggregate1"
+				}
+			],
 			"scriptLines": [
-				""
+				"source(output(",
+				"          id as long,",
+				"          product_url as string,",
+				"          color as string,",
+				"          size as string,",
+				"          width as string,",
+				"          brand_name_en as string,",
+				"          model_name as string,",
+				"          classification as string,",
+				"          purchaseCount as string,",
+				"          avgRating as float,",
+				"          qty as long,",
+				"          wishlistCount as long,",
+				"          market_price as long,",
+				"          lenskart_price as long,",
+				"          totalNoOfRatings as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source(output(",
+				"          customer_id as string,",
+				"          product_id as long,",
+				"          quantity as long,",
+				"          transaction_date as timestamp,",
+				"          transaction_id as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source2",
+				"source1, source2 join(id == product_id,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 select(mapColumn(",
+				"          id,",
+				"          brand_name_en,",
+				"          classification,",
+				"          lenskart_price,",
+				"          quantity",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 derive(tot_sales = quantity*lenskart_price) ~> derivedColumn1",
+				"derivedColumn1 aggregate(groupBy(brand_name_en),",
+				"     total_sold = sum(tot_sales)) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
