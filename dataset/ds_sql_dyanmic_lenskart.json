@@ -1,5 +1,5 @@
 {
-	"name": "ds_customers",
+	"name": "ds_sql_dyanmic_lenskart",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_asql_lenskart",
