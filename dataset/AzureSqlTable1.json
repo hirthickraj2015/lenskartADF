@@ -7,7 +7,17 @@
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": [],
+		"schema": [
+			{
+				"name": "classification",
+				"type": "nvarchar"
+			},
+			{
+				"name": "wishlistCount",
+				"type": "bigint",
+				"precision": 19
+			}
+		],
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "wishlist"
