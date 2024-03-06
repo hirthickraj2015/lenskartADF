@@ -13,6 +13,489 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/df_monthly_revenue')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "db_transactions_sql",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_products_sql",
+								"type": "DatasetReference"
+							},
+							"name": "source2"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_total_stocks",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "join1"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "aggregate1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          customer_id as string,",
+						"          product_id as long,",
+						"          quantity as long,",
+						"          transaction_date as timestamp,",
+						"          transaction_id as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source1",
+						"source(output(",
+						"          id as long,",
+						"          product_url as string,",
+						"          color as string,",
+						"          size as string,",
+						"          width as string,",
+						"          brand_name_en as string,",
+						"          model_name as string,",
+						"          classification as string,",
+						"          purchaseCount as string,",
+						"          avgRating as float,",
+						"          qty as long,",
+						"          wishlistCount as long,",
+						"          market_price as long,",
+						"          lenskart_price as long,",
+						"          totalNoOfRatings as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source2",
+						"source1 derive(month = month(transaction_date),",
+						"          year = year(transaction_date)) ~> derivedColumn1",
+						"source2, derivedColumn1 join(id == product_id,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"join1 derive(total_price = lenskart_price*quantity) ~> derivedColumn2",
+						"derivedColumn2 aggregate(groupBy(month,",
+						"          year),",
+						"     revenues = sum(total_price)) ~> aggregate1",
+						"aggregate1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          classification as string,",
+						"          total_stock as long",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     recreate:true,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_top_performing_customer')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "db_transactions_sql",
+								"type": "DatasetReference"
+							},
+							"name": "Transactions"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_products_sql",
+								"type": "DatasetReference"
+							},
+							"name": "Products"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_customers_sql",
+								"type": "DatasetReference"
+							},
+							"name": "Customers"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "db_top_performing_customer",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "join1"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "join2"
+						},
+						{
+							"name": "select2"
+						},
+						{
+							"name": "sort1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          customer_id as string,",
+						"          product_id as long,",
+						"          quantity as long,",
+						"          transaction_date as timestamp,",
+						"          transaction_id as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> Transactions",
+						"source(output(",
+						"          id as long,",
+						"          product_url as string,",
+						"          color as string,",
+						"          size as string,",
+						"          width as string,",
+						"          brand_name_en as string,",
+						"          model_name as string,",
+						"          classification as string,",
+						"          purchaseCount as string,",
+						"          avgRating as float,",
+						"          qty as long,",
+						"          wishlistCount as long,",
+						"          market_price as long,",
+						"          lenskart_price as long,",
+						"          totalNoOfRatings as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> Products",
+						"source(output(",
+						"          customer_id as string,",
+						"          first_name as string,",
+						"          last_name as string,",
+						"          email as string,",
+						"          phone_number as long,",
+						"          address as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> Customers",
+						"Transactions, Products join(product_id == id,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"join1 select(mapColumn(",
+						"          customer_id,",
+						"          product_id,",
+						"          quantity,",
+						"          lenskart_price",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 derive(total_amount = quantity * lenskart_price) ~> derivedColumn1",
+						"derivedColumn1 aggregate(groupBy(customer_id),",
+						"     quantity = sum(quantity),",
+						"          total_amount = sum(total_amount)) ~> aggregate1",
+						"aggregate1, Customers join(aggregate1@customer_id == Customers@customer_id,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join2",
+						"join2 select(mapColumn(",
+						"          customer_id = Customers@customer_id,",
+						"          quantity,",
+						"          total_amount,",
+						"          first_name,",
+						"          phone_number",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select2",
+						"select2 sort(desc(total_amount, true)) ~> sort1",
+						"sort1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          customer_id as string,",
+						"          first_name as string,",
+						"          {Amount Spent} as long,",
+						"          {Total Quantity} as long,",
+						"          phone_number as long",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_top_products')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "db_transactions_sql",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_products_sql",
+								"type": "DatasetReference"
+							},
+							"name": "source2"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_top_products",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "join1"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "sort1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          customer_id as string,",
+						"          product_id as long,",
+						"          quantity as long,",
+						"          transaction_date as timestamp,",
+						"          transaction_id as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source1",
+						"source(output(",
+						"          id as long,",
+						"          product_url as string,",
+						"          color as string,",
+						"          size as string,",
+						"          width as string,",
+						"          brand_name_en as string,",
+						"          model_name as string,",
+						"          classification as string,",
+						"          purchaseCount as string,",
+						"          avgRating as float,",
+						"          qty as long,",
+						"          wishlistCount as long,",
+						"          market_price as long,",
+						"          lenskart_price as long,",
+						"          totalNoOfRatings as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source2",
+						"source1, source2 join(product_id == id,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"join1 derive(total_price = quantity*lenskart_price) ~> derivedColumn1",
+						"derivedColumn1 aggregate(groupBy(product_id),",
+						"     total_sales = sum(total_price)) ~> aggregate1",
+						"aggregate1 sort(desc(total_sales, true)) ~> sort1",
+						"sort1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_totalSpent_catogary')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "db_transactions_sql",
+								"type": "DatasetReference"
+							},
+							"name": "transactionSrc"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_products_sql",
+								"type": "DatasetReference"
+							},
+							"name": "productSrc"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_categorySale_sql",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "join1"
+						},
+						{
+							"name": "select1"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "aggregate1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          customer_id as string,",
+						"          product_id as long,",
+						"          quantity as long,",
+						"          transaction_date as timestamp,",
+						"          transaction_id as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> transactionSrc",
+						"source(output(",
+						"          id as long,",
+						"          product_url as string,",
+						"          color as string,",
+						"          size as string,",
+						"          width as string,",
+						"          brand_name_en as string,",
+						"          model_name as string,",
+						"          classification as string,",
+						"          purchaseCount as string,",
+						"          avgRating as float,",
+						"          qty as long,",
+						"          wishlistCount as long,",
+						"          market_price as long,",
+						"          lenskart_price as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> productSrc",
+						"transactionSrc, productSrc join(product_id == id,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"join1 select(mapColumn(",
+						"          product_id,",
+						"          quantity,",
+						"          classification,",
+						"          lenskart_price",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 derive(tot_sales = quantity*lenskart_price) ~> derivedColumn1",
+						"derivedColumn1 aggregate(groupBy(classification),",
+						"     total_sale = sum(tot_sales)) ~> aggregate1",
+						"aggregate1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/df_totalStock')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -31,7 +514,7 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "AzureSqlTable4",
+								"referenceName": "ds_total_stocks",
 								"type": "DatasetReference"
 							},
 							"name": "sink1"
@@ -72,6 +555,117 @@
 						"aggregate1 sort(desc(total_stock, true)) ~> sort1",
 						"sort1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
+						"     input(",
+						"          classification as string,",
+						"          total_stock as long",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     recreate:true,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_worst_perfo_products')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_products_sql",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "AzureSqlTable5",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "join1"
+						},
+						{
+							"name": "finalTableFormation"
+						},
+						{
+							"name": "filter2"
+						},
+						{
+							"name": "sort1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          id as long,",
+						"          product_url as string,",
+						"          color as string,",
+						"          size as string,",
+						"          width as string,",
+						"          brand_name_en as string,",
+						"          model_name as string,",
+						"          classification as string,",
+						"          purchaseCount as string,",
+						"          avgRating as float,",
+						"          qty as long,",
+						"          wishlistCount as long,",
+						"          market_price as long,",
+						"          lenskart_price as long,",
+						"          totalNoOfRatings as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source1",
+						"source1 derive(metrics = avgRating/totalNoOfRatings) ~> derivedColumn1",
+						"filter2 aggregate(groupBy(id),",
+						"     min_const = min(metrics)) ~> aggregate1",
+						"aggregate1, derivedColumn1 join(aggregate1@id == source1@id,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"join1 select(mapColumn(",
+						"          id = aggregate1@id,",
+						"          brand_name_en,",
+						"          model_name,",
+						"          classification,",
+						"          avgRating,",
+						"          lenskart_price,",
+						"          totalNoOfRatings,",
+						"          metrics,",
+						"          desision_col = min_const",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> finalTableFormation",
+						"derivedColumn1 filter(!isNull(metrics)) ~> filter2",
+						"finalTableFormation sort(asc(avgRating, true),",
+						"     desc(totalNoOfRatings, true)) ~> sort1",
+						"sort1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
 						"     deletable:false,",
 						"     insertable:true,",
 						"     updateable:false,",
@@ -105,7 +699,7 @@
 					"sinks": [
 						{
 							"dataset": {
-								"referenceName": "AzureSqlTable2",
+								"referenceName": "ds_best_stores",
 								"type": "DatasetReference"
 							},
 							"name": "sink1"
@@ -260,6 +854,67 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/yearly_sales')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_monthly_rev",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "AzureSqlTable7",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "aggregate1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          month as integer,",
+						"          year as integer,",
+						"          revenues as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source1",
+						"source1 aggregate(groupBy(year),",
+						"     revenue = sum(revenues)) ~> aggregate1",
+						"aggregate1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          year as integer,",
+						"          revenue as long",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/data_conv')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -357,13 +1012,13 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_customer_denisty')]",
+			"name": "[concat(parameters('factoryName'), '/pl_city_sales')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "DF_customer_Density",
+						"name": "city_sales",
 						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
@@ -376,10 +1031,11 @@
 						"userProperties": [],
 						"typeProperties": {
 							"dataflow": {
-								"referenceName": "df_customer_Density",
+								"referenceName": "df_city_sales",
 								"type": "DataFlowReference",
 								"parameters": {},
 								"datasetParameters": {
+									"source1": {},
 									"source2": {},
 									"sink1": {}
 								}
@@ -401,13 +1057,13 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pl_customer_density')]",
+			"name": "[concat(parameters('factoryName'), '/pl_customer_denisty')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "Data flow1",
+						"name": "DF_customer_Density",
 						"type": "ExecuteDataFlow",
 						"dependsOn": [],
 						"policy": {
@@ -487,7 +1143,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_monthly_revenue')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_lenskart_offers')]",
@@ -622,7 +1280,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_totalSpent_catogary')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_top_performing_customer')]",
@@ -668,7 +1328,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_top_performing_customer')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_top_selling_product')]",
@@ -713,7 +1375,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_top_products')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_wishlist')]",
@@ -759,52 +1423,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/wishlist_transform')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/top_performing_store_rating')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Data flow1",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "top_performing_store_rating",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"source1": {},
-									"sink1": {}
-								}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/top_performing_store_rating')]"
 			]
 		}
 	]

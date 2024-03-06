@@ -13,6 +13,51 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_customers_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_asql_lenskart",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "customer_id",
+						"type": "nvarchar"
+					},
+					{
+						"name": "first_name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "last_name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "email",
+						"type": "nvarchar"
+					},
+					{
+						"name": "phone_number",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "address",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "customers"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_lenkart_datalist')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -97,6 +142,41 @@
 						"type": "String"
 					}
 				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_monthly_rev')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_asql_lenskart",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "month",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "year",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "revenues",
+						"type": "bigint",
+						"precision": 19
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "monthly_revenues"
+				}
 			},
 			"dependsOn": []
 		},
@@ -345,6 +425,25 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_top_products')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_asql_lenskart",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "topProductts"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_top_products_sql')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -378,6 +477,35 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "top_products"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_total_stocks')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_asql_lenskart",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "classification",
+						"type": "nvarchar"
+					},
+					{
+						"name": "total_stock",
+						"type": "bigint",
+						"precision": 19
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "totalStocks"
 				}
 			},
 			"dependsOn": []
@@ -482,143 +610,6 @@
 				"schema": []
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/seeder')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "JsonReadSettings"
-								}
-							},
-							"dataset": {
-								"referenceName": "ds_lenkart_datalist",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Copy Data From Lenskart List",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "AzureBlobStorageReadSettings",
-												"recursive": true,
-												"enablePartitionDiscovery": false
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false,
-											"tableOption": "autoCreate",
-											"disableMetricsCollection": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "ds_lenskart_raw_csv",
-											"type": "DatasetReference",
-											"parameters": {
-												"fileName": {
-													"value": "@item().fileName",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "ds_sql_dyanmic_lenskart",
-											"type": "DatasetReference",
-											"parameters": {
-												"databaseName": {
-													"value": "@item().databaseName",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_lenkart_datalist')]",
-				"[concat(variables('factoryId'), '/datasets/ds_lenskart_raw_csv')]",
-				"[concat(variables('factoryId'), '/datasets/ds_sql_dyanmic_lenskart')]"
-			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/df_brandSales')]",
@@ -733,6 +724,91 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_products_sql')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_city_sales')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "AzureSqlTable5",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_cust_sql",
+								"type": "DatasetReference"
+							},
+							"name": "source2"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "AzureSqlTable6",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "join1"
+						},
+						{
+							"name": "aggregate1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          customer_id as string,",
+						"          first_name as string,",
+						"          {Amount Spent} as long,",
+						"          {Total Quantity} as long,",
+						"          phone_number as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source1",
+						"source(output(",
+						"          customer_id as string,",
+						"          customer_name as string,",
+						"          email as string,",
+						"          pincode as integer,",
+						"          city as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source2",
+						"source1, source2 join(source1@customer_id == source2@customer_id,",
+						"     joinType:'inner',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"join1 aggregate(groupBy(city),",
+						"     revenue = sum({Amount Spent})) ~> aggregate1",
+						"aggregate1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/df_csv_to_table')]",
@@ -991,7 +1067,8 @@
 				"[concat(variables('factoryId'), '/datasets/ds_reviews_csv')]",
 				"[concat(variables('factoryId'), '/datasets/ds_stores_csv')]",
 				"[concat(variables('factoryId'), '/datasets/ds_transactions_csv')]",
-				"[concat(variables('factoryId'), '/datasets/ds_products_sql')]"
+				"[concat(variables('factoryId'), '/datasets/ds_products_sql')]",
+				"[concat(variables('factoryId'), '/datasets/ds_customers_sql')]"
 			]
 		},
 		{
@@ -1137,493 +1214,6 @@
 						"          Differnence as long,",
 						"          Percentage as double",
 						"     ),",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_products_sql')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/df_monthly_revenue')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "db_transactions_sql",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						},
-						{
-							"dataset": {
-								"referenceName": "ds_products_sql",
-								"type": "DatasetReference"
-							},
-							"name": "source2"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "AzureSqlTable4",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "derivedColumn1"
-						},
-						{
-							"name": "join1"
-						},
-						{
-							"name": "derivedColumn2"
-						},
-						{
-							"name": "aggregate1"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          customer_id as string,",
-						"          product_id as long,",
-						"          quantity as long,",
-						"          transaction_date as timestamp,",
-						"          transaction_id as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> source1",
-						"source(output(",
-						"          id as long,",
-						"          product_url as string,",
-						"          color as string,",
-						"          size as string,",
-						"          width as string,",
-						"          brand_name_en as string,",
-						"          model_name as string,",
-						"          classification as string,",
-						"          purchaseCount as string,",
-						"          avgRating as float,",
-						"          qty as long,",
-						"          wishlistCount as long,",
-						"          market_price as long,",
-						"          lenskart_price as long,",
-						"          totalNoOfRatings as long",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> source2",
-						"source1 derive(month = month(transaction_date),",
-						"          year = year(transaction_date)) ~> derivedColumn1",
-						"source2, derivedColumn1 join(id == product_id,",
-						"     joinType:'inner',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> join1",
-						"join1 derive(total_price = lenskart_price*quantity) ~> derivedColumn2",
-						"derivedColumn2 aggregate(groupBy(month,",
-						"          year),",
-						"     revenues = sum(total_price)) ~> aggregate1",
-						"aggregate1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     recreate:true,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_products_sql')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/df_top_performing_customer')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "db_transactions_sql",
-								"type": "DatasetReference"
-							},
-							"name": "Transactions"
-						},
-						{
-							"dataset": {
-								"referenceName": "ds_products_sql",
-								"type": "DatasetReference"
-							},
-							"name": "Products"
-						},
-						{
-							"dataset": {
-								"referenceName": "ds_customers_sql",
-								"type": "DatasetReference"
-							},
-							"name": "Customers"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "db_top_performing_customer",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "join1"
-						},
-						{
-							"name": "select1"
-						},
-						{
-							"name": "derivedColumn1"
-						},
-						{
-							"name": "aggregate1"
-						},
-						{
-							"name": "join2"
-						},
-						{
-							"name": "select2"
-						},
-						{
-							"name": "sort1"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          customer_id as string,",
-						"          product_id as long,",
-						"          quantity as long,",
-						"          transaction_date as timestamp,",
-						"          transaction_id as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> Transactions",
-						"source(output(",
-						"          id as long,",
-						"          product_url as string,",
-						"          color as string,",
-						"          size as string,",
-						"          width as string,",
-						"          brand_name_en as string,",
-						"          model_name as string,",
-						"          classification as string,",
-						"          purchaseCount as string,",
-						"          avgRating as float,",
-						"          qty as long,",
-						"          wishlistCount as long,",
-						"          market_price as long,",
-						"          lenskart_price as long,",
-						"          totalNoOfRatings as long",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> Products",
-						"source(output(",
-						"          customer_id as string,",
-						"          first_name as string,",
-						"          last_name as string,",
-						"          email as string,",
-						"          phone_number as long,",
-						"          address as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> Customers",
-						"Transactions, Products join(product_id == id,",
-						"     joinType:'inner',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> join1",
-						"join1 select(mapColumn(",
-						"          customer_id,",
-						"          product_id,",
-						"          quantity,",
-						"          lenskart_price",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select1",
-						"select1 derive(total_amount = quantity * lenskart_price) ~> derivedColumn1",
-						"derivedColumn1 aggregate(groupBy(customer_id),",
-						"     quantity = sum(quantity),",
-						"          total_amount = sum(total_amount)) ~> aggregate1",
-						"aggregate1, Customers join(aggregate1@customer_id == Customers@customer_id,",
-						"     joinType:'inner',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> join2",
-						"join2 select(mapColumn(",
-						"          customer_id = Customers@customer_id,",
-						"          quantity,",
-						"          total_amount,",
-						"          first_name,",
-						"          phone_number",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select2",
-						"select2 sort(desc(total_amount, true)) ~> sort1",
-						"sort1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          customer_id as string,",
-						"          first_name as string,",
-						"          {Amount Spent} as long,",
-						"          {Total Quantity} as long,",
-						"          phone_number as long",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_products_sql')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/df_top_products')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "db_transactions_sql",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						},
-						{
-							"dataset": {
-								"referenceName": "ds_products_sql",
-								"type": "DatasetReference"
-							},
-							"name": "source2"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "AzureSqlTable3",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "join1"
-						},
-						{
-							"name": "derivedColumn1"
-						},
-						{
-							"name": "aggregate1"
-						},
-						{
-							"name": "sort1"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          customer_id as string,",
-						"          product_id as long,",
-						"          quantity as long,",
-						"          transaction_date as timestamp,",
-						"          transaction_id as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> source1",
-						"source(output(",
-						"          id as long,",
-						"          product_url as string,",
-						"          color as string,",
-						"          size as string,",
-						"          width as string,",
-						"          brand_name_en as string,",
-						"          model_name as string,",
-						"          classification as string,",
-						"          purchaseCount as string,",
-						"          avgRating as float,",
-						"          qty as long,",
-						"          wishlistCount as long,",
-						"          market_price as long,",
-						"          lenskart_price as long,",
-						"          totalNoOfRatings as long",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> source2",
-						"source1, source2 join(product_id == id,",
-						"     joinType:'inner',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> join1",
-						"join1 derive(total_price = quantity*lenskart_price) ~> derivedColumn1",
-						"derivedColumn1 aggregate(groupBy(product_id),",
-						"     total_sales = sum(total_price)) ~> aggregate1",
-						"aggregate1 sort(desc(total_sales, true)) ~> sort1",
-						"sort1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ds_products_sql')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/df_totalSpent_catogary')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "db_transactions_sql",
-								"type": "DatasetReference"
-							},
-							"name": "transactionSrc"
-						},
-						{
-							"dataset": {
-								"referenceName": "ds_products_sql",
-								"type": "DatasetReference"
-							},
-							"name": "productSrc"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "ds_categorySale_sql",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "join1"
-						},
-						{
-							"name": "select1"
-						},
-						{
-							"name": "derivedColumn1"
-						},
-						{
-							"name": "aggregate1"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          customer_id as string,",
-						"          product_id as long,",
-						"          quantity as long,",
-						"          transaction_date as timestamp,",
-						"          transaction_id as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> transactionSrc",
-						"source(output(",
-						"          id as long,",
-						"          product_url as string,",
-						"          color as string,",
-						"          size as string,",
-						"          width as string,",
-						"          brand_name_en as string,",
-						"          model_name as string,",
-						"          classification as string,",
-						"          purchaseCount as string,",
-						"          avgRating as float,",
-						"          qty as long,",
-						"          wishlistCount as long,",
-						"          market_price as long,",
-						"          lenskart_price as long",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     isolationLevel: 'READ_UNCOMMITTED',",
-						"     format: 'table') ~> productSrc",
-						"transactionSrc, productSrc join(product_id == id,",
-						"     joinType:'inner',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> join1",
-						"join1 select(mapColumn(",
-						"          product_id,",
-						"          quantity,",
-						"          classification,",
-						"          lenskart_price",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select1",
-						"select1 derive(tot_sales = quantity*lenskart_price) ~> derivedColumn1",
-						"derivedColumn1 aggregate(groupBy(classification),",
-						"     total_sale = sum(tot_sales)) ~> aggregate1",
-						"aggregate1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
 						"     deletable:false,",
 						"     insertable:true,",
 						"     updateable:false,",

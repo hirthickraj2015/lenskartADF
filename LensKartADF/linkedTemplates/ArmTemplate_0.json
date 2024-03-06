@@ -64,7 +64,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlTable2')]",
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable5')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -77,7 +77,7 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "best_performing_store"
+					"table": "worstProducts"
 				}
 			},
 			"dependsOn": [
@@ -85,7 +85,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlTable3')]",
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable6')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -98,7 +98,7 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "topProductts"
+					"table": "city_sales"
 				}
 			},
 			"dependsOn": [
@@ -106,7 +106,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlTable4')]",
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable7')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -116,10 +116,21 @@
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
-				"schema": [],
+				"schema": [
+					{
+						"name": "year",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "revenue",
+						"type": "bigint",
+						"precision": 19
+					}
+				],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "totalStocks"
+					"table": "yearly_sales"
 				}
 			},
 			"dependsOn": [
@@ -448,6 +459,27 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_best_stores')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_asql_lenskart",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "best_performing_store"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_asql_lenskart')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_brandSales')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -608,53 +640,6 @@
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ds_customers_data_sql')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ls_asql_lenskart",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "customer_id",
-						"type": "nvarchar"
-					},
-					{
-						"name": "first_name",
-						"type": "nvarchar"
-					},
-					{
-						"name": "last_name",
-						"type": "nvarchar"
-					},
-					{
-						"name": "email",
-						"type": "nvarchar"
-					},
-					{
-						"name": "phone_number",
-						"type": "bigint",
-						"precision": 19
-					},
-					{
-						"name": "address",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "customers"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/ls_asql_lenskart')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ds_customers_sql')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
