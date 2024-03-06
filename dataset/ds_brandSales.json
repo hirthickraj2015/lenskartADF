@@ -1,5 +1,5 @@
 {
-	"name": "AzureSqlTable2",
+	"name": "ds_brandSales",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_asql_lenskart",

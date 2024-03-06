@@ -1,5 +1,5 @@
 {
-	"name": "AzureSqlTable1",
+	"name": "ds_wishlist",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_asql_lenskart",
