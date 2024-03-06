@@ -1,0 +1,69 @@
+{
+	"name": "wishlist_transform",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_products_sql",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregateClassification"
+				},
+				{
+					"name": "sortWishlist"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id as long,",
+				"          product_url as string,",
+				"          color as string,",
+				"          size as string,",
+				"          width as string,",
+				"          brand_name_en as string,",
+				"          model_name as string,",
+				"          classification as string,",
+				"          purchaseCount as string,",
+				"          avgRating as float,",
+				"          qty as long,",
+				"          wishlistCount as long,",
+				"          market_price as long,",
+				"          lenskart_price as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 aggregate(groupBy(classification),",
+				"     wishlistCount = sum(wishlistCount)) ~> aggregateClassification",
+				"aggregateClassification sort(desc(wishlistCount, true)) ~> sortWishlist",
+				"sortWishlist sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}
