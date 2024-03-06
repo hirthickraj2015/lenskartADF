@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "ds_wishlist",
+						"referenceName": "AzureSqlTable1",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -55,15 +55,10 @@
 				"aggregateClassification sort(desc(wishlistCount, true)) ~> sortWishlist",
 				"sortWishlist sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     input(",
-				"          classification as string,",
-				"          wishlistCount as long",
-				"     ),",
 				"     deletable:false,",
 				"     insertable:true,",
 				"     updateable:false,",
 				"     upsertable:false,",
-				"     recreate:true,",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",

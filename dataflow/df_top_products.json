@@ -22,7 +22,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "ds_top_products_sql_azure",
+						"referenceName": "AzureSqlTable3",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -34,6 +34,12 @@
 				},
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "sort1"
 				}
 			],
 			"scriptLines": [
@@ -75,7 +81,10 @@
 				"     ignoreSpaces: false,",
 				"     broadcast: 'auto')~> join1",
 				"join1 derive(total_price = quantity*lenskart_price) ~> derivedColumn1",
-				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"derivedColumn1 aggregate(groupBy(product_id),",
+				"     total_sales = sum(total_price)) ~> aggregate1",
+				"aggregate1 sort(desc(total_sales, true)) ~> sort1",
+				"sort1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
 				"     insertable:true,",
@@ -84,30 +93,7 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError',",
-				"     mapColumn(",
-				"          customer_id,",
-				"          product_id,",
-				"          quantity,",
-				"          transaction_date,",
-				"          transaction_id,",
-				"          id,",
-				"          product_url,",
-				"          color,",
-				"          size,",
-				"          width,",
-				"          brand_name_en,",
-				"          model_name,",
-				"          classification,",
-				"          purchaseCount,",
-				"          avgRating,",
-				"          qty,",
-				"          wishlistCount,",
-				"          market_price,",
-				"          lenskart_price,",
-				"          totalNoOfRatings,",
-				"          total_price",
-				"     )) ~> sink1"
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
