@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Data flow1",
+				"name": "df_categorysale",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
