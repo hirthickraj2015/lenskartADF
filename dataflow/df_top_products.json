@@ -22,7 +22,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "AzureSqlTable3",
+						"referenceName": "ds_top_products",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"

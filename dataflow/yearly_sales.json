@@ -1,0 +1,36 @@
+{
+	"name": "yearly_sales",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_monthly_rev",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          month as integer,",
+				"          year as integer,",
+				"          revenues as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 aggregate(groupBy(year),",
+				"     revenue = sum(revenues)) ~> aggregate1"
+			]
+		}
+	}
+}

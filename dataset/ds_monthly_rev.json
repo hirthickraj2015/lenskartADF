@@ -1,5 +1,5 @@
 {
-	"name": "ds_total_stocks",
+	"name": "ds_monthly_rev",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_asql_lenskart",
@@ -9,18 +9,24 @@
 		"type": "AzureSqlTable",
 		"schema": [
 			{
-				"name": "classification",
-				"type": "nvarchar"
+				"name": "month",
+				"type": "int",
+				"precision": 10
 			},
 			{
-				"name": "total_stock",
+				"name": "year",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "revenues",
 				"type": "bigint",
 				"precision": 19
 			}
 		],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "totalStocks"
+			"table": "monthly_revenues"
 		}
 	}
 }

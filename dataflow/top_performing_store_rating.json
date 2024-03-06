@@ -15,7 +15,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "AzureSqlTable2",
+						"referenceName": "ds_best_stores",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"

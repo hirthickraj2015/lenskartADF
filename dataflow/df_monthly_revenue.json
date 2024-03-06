@@ -22,7 +22,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "AzureSqlTable4",
+						"referenceName": "ds_total_stocks",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -88,6 +88,10 @@
 				"     revenues = sum(total_price)) ~> aggregate1",
 				"aggregate1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     input(",
+				"          classification as string,",
+				"          total_stock as long",
+				"     ),",
 				"     deletable:false,",
 				"     insertable:true,",
 				"     updateable:false,",
