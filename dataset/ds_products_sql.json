@@ -7,7 +7,75 @@
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": [],
+		"schema": [
+			{
+				"name": "id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "product_url",
+				"type": "nvarchar"
+			},
+			{
+				"name": "color",
+				"type": "nvarchar"
+			},
+			{
+				"name": "size",
+				"type": "nvarchar"
+			},
+			{
+				"name": "width",
+				"type": "nvarchar"
+			},
+			{
+				"name": "brand_name_en",
+				"type": "nvarchar"
+			},
+			{
+				"name": "model_name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "classification",
+				"type": "nvarchar"
+			},
+			{
+				"name": "purchaseCount",
+				"type": "nvarchar"
+			},
+			{
+				"name": "avgRating",
+				"type": "real",
+				"precision": 7
+			},
+			{
+				"name": "qty",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "wishlistCount",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "market_price",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "lenskart_price",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "totalNoOfRatings",
+				"type": "bigint",
+				"precision": 19
+			}
+		],
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "products"
