@@ -120,7 +120,7 @@
 				"derivedColumn1 aggregate(groupBy(customer_id),",
 				"     quantity = sum(quantity),",
 				"          total_amount = sum(total_amount)) ~> aggregate1",
-				"aggregate1, Customers join(ERROR_FUNCTION('') == ERROR_FUNCTION(''),",
+				"aggregate1, Customers join(aggregate1@customer_id == Customers@customer_id,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
