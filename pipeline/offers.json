@@ -1,5 +1,5 @@
 {
-	"name": "top_performing_customer",
+	"name": "offers",
 	"properties": {
 		"activities": [
 			{
@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_Top_Performing_Customer",
+						"referenceName": "df_Offers",
 						"type": "DataFlowReference"
 					},
 					"compute": {
