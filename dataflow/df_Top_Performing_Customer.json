@@ -1,5 +1,5 @@
 {
-	"name": "dataflow1",
+	"name": "df_Top_Performing_Customer",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
@@ -16,7 +16,7 @@
 						"referenceName": "ds_products_sql",
 						"type": "DatasetReference"
 					},
-					"name": "products"
+					"name": "Products"
 				},
 				{
 					"dataset": {
@@ -26,7 +26,15 @@
 					"name": "Customers"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "join1"
@@ -82,7 +90,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> products",
+				"     format: 'table') ~> Products",
 				"source(output(",
 				"          customer_id as string,",
 				"          first_name as string,",
@@ -95,7 +103,7 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> Customers",
-				"Transactions, products join(product_id == id,",
+				"Transactions, Products join(product_id == id,",
 				"     joinType:'inner',",
 				"     matchType:'exact',",
 				"     ignoreSpaces: false,",
@@ -126,7 +134,17 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select2",
-				"select2 sort(desc({Amount Spent}, true)) ~> sort1"
+				"select2 sort(desc({Amount Spent}, true)) ~> sort1",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
