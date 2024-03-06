@@ -1,0 +1,68 @@
+{
+	"name": "ds_stores_csv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ablob_lenskart",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "store_data.csv",
+				"container": "lenskartcontainer"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "id",
+				"type": "String"
+			},
+			{
+				"name": "alt_store_name_catch",
+				"type": "String"
+			},
+			{
+				"name": "address_full",
+				"type": "String"
+			},
+			{
+				"name": "address_state",
+				"type": "String"
+			},
+			{
+				"name": "store_phone",
+				"type": "String"
+			},
+			{
+				"name": "store_email",
+				"type": "String"
+			},
+			{
+				"name": "business_hours_openi",
+				"type": "String"
+			},
+			{
+				"name": "business_hours_closi",
+				"type": "String"
+			},
+			{
+				"name": "averageRating",
+				"type": "String"
+			},
+			{
+				"name": "totalReviews",
+				"type": "String"
+			},
+			{
+				"name": "pincode",
+				"type": "String"
+			}
+		]
+	}
+}

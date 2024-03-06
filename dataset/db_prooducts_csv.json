@@ -1,0 +1,80 @@
+{
+	"name": "db_prooducts_csv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ablob_lenskart",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "products.csv",
+				"container": "lenskartcontainer"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "id",
+				"type": "String"
+			},
+			{
+				"name": "product_url",
+				"type": "String"
+			},
+			{
+				"name": "color",
+				"type": "String"
+			},
+			{
+				"name": "size",
+				"type": "String"
+			},
+			{
+				"name": "width",
+				"type": "String"
+			},
+			{
+				"name": "brand_name_en",
+				"type": "String"
+			},
+			{
+				"name": "model_name",
+				"type": "String"
+			},
+			{
+				"name": "classification",
+				"type": "String"
+			},
+			{
+				"name": "purchaseCount",
+				"type": "String"
+			},
+			{
+				"name": "avgRating",
+				"type": "String"
+			},
+			{
+				"name": "qty",
+				"type": "String"
+			},
+			{
+				"name": "wishlistCount",
+				"type": "String"
+			},
+			{
+				"name": "market_price",
+				"type": "String"
+			},
+			{
+				"name": "lenskart_price",
+				"type": "String"
+			}
+		]
+	}
+}

@@ -1,0 +1,56 @@
+{
+	"name": "ds_reviews_csv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_ablob_lenskart",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "reviews_data.csv",
+				"container": "lenskartcontainer"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "id",
+				"type": "String"
+			},
+			{
+				"name": "reviewId",
+				"type": "String"
+			},
+			{
+				"name": "reviewTitle",
+				"type": "String"
+			},
+			{
+				"name": "reviewDetail",
+				"type": "String"
+			},
+			{
+				"name": "reviewee",
+				"type": "String"
+			},
+			{
+				"name": "noOfStars",
+				"type": "String"
+			},
+			{
+				"name": "reviewDate",
+				"type": "String"
+			},
+			{
+				"name": "reviewerType",
+				"type": "String"
+			}
+		]
+	}
+}

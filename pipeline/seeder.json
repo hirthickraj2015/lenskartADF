@@ -78,7 +78,9 @@
 								"sink": {
 									"type": "AzureSqlSink",
 									"writeBehavior": "insert",
-									"sqlWriterUseTableLock": false
+									"sqlWriterUseTableLock": false,
+									"tableOption": "autoCreate",
+									"disableMetricsCollection": false
 								},
 								"enableStaging": false,
 								"translator": {
@@ -104,7 +106,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ds_customers",
+									"referenceName": "ds_sql_dyanmic_lenskart",
 									"type": "DatasetReference",
 									"parameters": {
 										"databaseName": {
