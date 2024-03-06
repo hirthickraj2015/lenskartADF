@@ -7,7 +7,31 @@
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": [],
+		"schema": [
+			{
+				"name": "customer_id",
+				"type": "nvarchar"
+			},
+			{
+				"name": "product_id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "quantity",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "transaction_date",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "transaction_id",
+				"type": "nvarchar"
+			}
+		],
 		"typeProperties": {
 			"schema": "dbo",
 			"table": "transactions"
