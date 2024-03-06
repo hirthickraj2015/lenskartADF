@@ -1,0 +1,40 @@
+{
+	"name": "db_top_performing_customer",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_asql_lenskart",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "customer_id",
+				"type": "nvarchar"
+			},
+			{
+				"name": "first_name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Amount Spent",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "Total Quantity",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "phone_number",
+				"type": "bigint",
+				"precision": 19
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "top_performing_customer"
+		}
+	}
+}

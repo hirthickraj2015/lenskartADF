@@ -1,5 +1,5 @@
 {
-	"name": "df_brandSales",
+	"name": "df_lenskart_offers",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
@@ -10,19 +10,12 @@
 						"type": "DatasetReference"
 					},
 					"name": "source1"
-				},
-				{
-					"dataset": {
-						"referenceName": "db_transactions_sql",
-						"type": "DatasetReference"
-					},
-					"name": "source2"
 				}
 			],
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "AzureSqlTable2",
+						"referenceName": "db_offers_and_discount",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -30,16 +23,16 @@
 			],
 			"transformations": [
 				{
-					"name": "join1"
-				},
-				{
 					"name": "select1"
 				},
 				{
 					"name": "derivedColumn1"
 				},
 				{
-					"name": "aggregate1"
+					"name": "sort1"
+				},
+				{
+					"name": "split1"
 				}
 			],
 			"scriptLines": [
@@ -64,41 +57,33 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> source1",
-				"source(output(",
-				"          customer_id as string,",
-				"          product_id as long,",
-				"          quantity as long,",
-				"          transaction_date as timestamp,",
-				"          transaction_id as string",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> source2",
-				"source1, source2 join(id == product_id,",
-				"     joinType:'inner',",
-				"     matchType:'exact',",
-				"     ignoreSpaces: false,",
-				"     broadcast: 'auto')~> join1",
-				"join1 select(mapColumn(",
+				"source1 select(mapColumn(",
 				"          id,",
 				"          brand_name_en,",
-				"          classification,",
-				"          lenskart_price,",
-				"          quantity",
+				"          market_price,",
+				"          lenskart_price",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"select1 derive(tot_sales = quantity*lenskart_price) ~> derivedColumn1",
-				"derivedColumn1 aggregate(groupBy(brand_name_en),",
-				"     total_sold = sum(tot_sales)) ~> aggregate1",
-				"aggregate1 sink(allowSchemaDrift: true,",
+				"select1 derive(Difference = abs(market_price - lenskart_price),",
+				"          Percentage = (abs(market_price - lenskart_price)/market_price)*100) ~> derivedColumn1",
+				"derivedColumn1 sort(desc(Percentage, true)) ~> sort1",
+				"sort1 split(Percentage != 0.0,",
+				"     disjoint: false) ~> split1@(true, false)",
+				"split1@true sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     input(",
+				"          id as long,",
+				"          brand_name_en as string,",
+				"          market_price as long,",
+				"          lenskart_price as long,",
+				"          Differnence as long,",
+				"          Percentage as double",
+				"     ),",
 				"     deletable:false,",
 				"     insertable:true,",
 				"     updateable:false,",
 				"     upsertable:false,",
-				"     recreate:true,",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",

@@ -1,0 +1,46 @@
+{
+	"name": "db_offers_and_discount",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_asql_lenskart",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "brand_name_en",
+				"type": "nvarchar"
+			},
+			{
+				"name": "market_price",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "lenskart_price",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "Differnence",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "Percentage",
+				"type": "float",
+				"precision": 15
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "offers and discount"
+		}
+	}
+}
