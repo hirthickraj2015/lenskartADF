@@ -1,0 +1,16 @@
+{
+	"name": "ds_top_products_sql_azure",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_asql_lenskart",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "top_products"
+		}
+	}
+}

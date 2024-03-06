@@ -22,7 +22,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "ds_top_products_sql",
+						"referenceName": "ds_top_products_sql_azure",
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
@@ -81,7 +81,6 @@
 				"     insertable:true,",
 				"     updateable:false,",
 				"     upsertable:false,",
-				"     truncate:true,",
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
