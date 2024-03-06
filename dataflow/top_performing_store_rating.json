@@ -1,0 +1,94 @@
+{
+	"name": "top_performing_store_rating",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "db_stores_sql",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable2",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "aggregate1"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "finalTableFormation"
+				},
+				{
+					"name": "filter1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id as long,",
+				"          alt_store_name_catch as string,",
+				"          address_full as string,",
+				"          address_state as string,",
+				"          store_phone as long,",
+				"          store_email as string,",
+				"          business_hours_openi as string,",
+				"          business_hours_closi as string,",
+				"          averageRating as float,",
+				"          totalReviews as float,",
+				"          pincode as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 derive(const = averageRating/totalReviews) ~> derivedColumn1",
+				"derivedColumn1 aggregate(groupBy(address_state),",
+				"     max_const = max(const)) ~> aggregate1",
+				"aggregate1, derivedColumn1 join(max_const == const,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 select(mapColumn(",
+				"          address_state = aggregate1@address_state,",
+				"          id,",
+				"          alt_store_name_catch,",
+				"          address_full,",
+				"          store_phone,",
+				"          store_email,",
+				"          averageRating,",
+				"          totalReviews,",
+				"          pincode",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> finalTableFormation",
+				"finalTableFormation filter(id != 1681) ~> filter1",
+				"filter1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}
