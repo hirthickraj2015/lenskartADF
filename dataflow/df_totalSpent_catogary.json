@@ -1,0 +1,72 @@
+{
+	"name": "df_totalSpent_catogary",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "db_transactions_sql",
+						"type": "DatasetReference"
+					},
+					"name": "transactionSrc"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_products_sql",
+						"type": "DatasetReference"
+					},
+					"name": "productSrc"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "filter1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          customer_id as string,",
+				"          product_id as long,",
+				"          quantity as long,",
+				"          transaction_date as timestamp,",
+				"          transaction_id as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> transactionSrc",
+				"source(output(",
+				"          id as long,",
+				"          product_url as string,",
+				"          color as string,",
+				"          size as string,",
+				"          width as string,",
+				"          brand_name_en as string,",
+				"          model_name as string,",
+				"          classification as string,",
+				"          purchaseCount as string,",
+				"          avgRating as float,",
+				"          qty as long,",
+				"          wishlistCount as long,",
+				"          market_price as long,",
+				"          lenskart_price as long",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> productSrc",
+				"transactionSrc, productSrc join(product_id == id,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 filter(id != null()) ~> filter1"
+			]
+		}
+	}
+}
