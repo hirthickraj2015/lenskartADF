@@ -11,13 +11,13 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_ablob_lenskart'"
 		},
+		"ls_asql_lenskart_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_asql_lenskart'"
+		},
 		"ls_dataset_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_dataset'"
-		},
-		"ls_to_sqlDB_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'ls_to_sqlDB'"
 		},
 		"containerUri": {
 			"type": "string",
@@ -49,15 +49,35 @@
 					"ls_ablob_lenskart_connectionString": {
 						"value": "[parameters('ls_ablob_lenskart_connectionString')]"
 					},
+					"ls_asql_lenskart_connectionString": {
+						"value": "[parameters('ls_asql_lenskart_connectionString')]"
+					},
 					"ls_dataset_connectionString": {
 						"value": "[parameters('ls_dataset_connectionString')]"
-					},
-					"ls_to_sqlDB_connectionString": {
-						"value": "[parameters('ls_to_sqlDB_connectionString')]"
 					}
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "LensKartADF_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'LensKartADF_ArmTemplate_0')]"
+			]
 		}
 	]
 }

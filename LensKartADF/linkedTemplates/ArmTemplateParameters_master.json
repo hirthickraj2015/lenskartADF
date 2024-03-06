@@ -8,10 +8,10 @@
 		"ls_ablob_lenskart_connectionString": {
 			"value": ""
 		},
-		"ls_dataset_connectionString": {
+		"ls_asql_lenskart_connectionString": {
 			"value": ""
 		},
-		"ls_to_sqlDB_connectionString": {
+		"ls_dataset_connectionString": {
 			"value": ""
 		},
 		"containerUri": {
