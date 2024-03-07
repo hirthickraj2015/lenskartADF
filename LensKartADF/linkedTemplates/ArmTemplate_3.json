@@ -814,6 +814,30 @@
 							"waitOnCompletion": true,
 							"parameters": {}
 						}
+					},
+					{
+						"name": "pl_wishlist",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pl_lenskart_offers",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_wishlist",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -830,7 +854,8 @@
 				"[concat(variables('factoryId'), '/pipelines/pl_lenskart_offers')]",
 				"[concat(variables('factoryId'), '/pipelines/top_performing_store_rating')]",
 				"[concat(variables('factoryId'), '/pipelines/pl_yearly_sales')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_stateStoreAvgrating')]"
+				"[concat(variables('factoryId'), '/pipelines/pl_stateStoreAvgrating')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_wishlist')]"
 			]
 		}
 	]
