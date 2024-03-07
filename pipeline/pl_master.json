@@ -316,6 +316,29 @@
 					},
 					"waitOnCompletion": true
 				}
+			},
+			{
+				"name": "pl_stateStoreAvgrating",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "pl_top_performing_customer1",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_stateStoreAvgrating",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
 			}
 		],
 		"annotations": []
