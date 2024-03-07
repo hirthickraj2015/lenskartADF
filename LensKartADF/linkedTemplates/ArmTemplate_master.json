@@ -19,6 +19,18 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_dataset'"
 		},
+		"ls_http_lenskart_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_http_lenskart'"
+		},
+		"ls_http_lenskart_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://raw.githubusercontent.com/"
+		},
+		"ls_http_lenskart_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "ls_mongo_expensetracker"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -54,6 +66,15 @@
 					},
 					"ls_dataset_connectionString": {
 						"value": "[parameters('ls_dataset_connectionString')]"
+					},
+					"ls_http_lenskart_password": {
+						"value": "[parameters('ls_http_lenskart_password')]"
+					},
+					"ls_http_lenskart_properties_typeProperties_url": {
+						"value": "[parameters('ls_http_lenskart_properties_typeProperties_url')]"
+					},
+					"ls_http_lenskart_properties_typeProperties_userName": {
+						"value": "[parameters('ls_http_lenskart_properties_typeProperties_userName')]"
 					}
 				}
 			},

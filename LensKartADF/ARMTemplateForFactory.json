@@ -18,6 +18,18 @@
 		"ls_dataset_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'ls_dataset'"
+		},
+		"ls_http_lenskart_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_http_lenskart'"
+		},
+		"ls_http_lenskart_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://raw.githubusercontent.com/"
+		},
+		"ls_http_lenskart_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "ls_mongo_expensetracker"
 		}
 	},
 	"variables": {
@@ -312,6 +324,388 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pl_master')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "data_conv",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "data_conv",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_brand_sales",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "data_conv",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_brand_sales",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_mostStock_category",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "data_conv",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_mostStock_category",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_worst_products",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pl_brand_sales",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_worst_products",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_purchased_category",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pl_mostStock_category",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_purchased_category",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_top_selling_product",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pl_worst_products",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_top_selling_product",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_top_performing_customer",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "data_conv",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_top_performing_customer",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_lenskart_offers",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pl_purchased_category",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_lenskart_offers",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "top_performing_store_rating",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "data_conv",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "top_performing_store_rating",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_city_sales",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "top_performing_store_rating",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_city_sales",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_customer_denisty",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pl_city_sales",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_customer_denisty",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_generate_monthly_revenues",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pl_top_performing_customer",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_generate_monthly_revenues",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_yearly_sales",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pl_generate_monthly_revenues",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_yearly_sales",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_top_performing_customer1",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pl_customer_denisty",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_top_performing_customer",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "pl_stateStoreAvgrating",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "pl_top_performing_customer1",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "pl_stateStoreAvgrating",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/data_conv')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_brand_sales')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_mostStock_category')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_worst_products')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_purchased_category')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_top_selling_product')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_top_performing_customer')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_lenskart_offers')]",
+				"[concat(variables('factoryId'), '/pipelines/top_performing_store_rating')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_city_sales')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_customer_denisty')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_generate_monthly_revenues')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_yearly_sales')]",
+				"[concat(variables('factoryId'), '/pipelines/pl_stateStoreAvgrating')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pl_mostStock_category')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -402,6 +796,52 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/df_totalSpent_catogary')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_stateStoreAvgrating')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "df_stateStoreAvgrating",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow1",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dataflow1')]"
 			]
 		},
 		{
@@ -1079,6 +1519,42 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_ablob_raw_lenskart')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_ablob_lenskart",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().fileName",
+							"type": "Expression"
+						},
+						"container": "raw"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_ablob_lenskart')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_best_stores')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1350,6 +1826,41 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_asql_lenskart')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_http_raw_csv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_http_lenskart",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"relativeUrl": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@dataset().relativeUrl",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_http_lenskart')]"
 			]
 		},
 		{
@@ -1629,6 +2140,27 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_ablob_lenskart')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_sateStoreAvgRating_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_asql_lenskart",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "sateStoreAvgRating"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_asql_lenskart')]"
 			]
 		},
 		{
@@ -1972,6 +2504,111 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_http_lenskart')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('ls_http_lenskart_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Basic",
+					"userName": "[parameters('ls_http_lenskart_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('ls_http_lenskart_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "db_stores_sql",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_sateStoreAvgRating_sql",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "select1"
+						},
+						{
+							"name": "aggregate1"
+						},
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "sort1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          id as long,",
+						"          alt_store_name_catch as string,",
+						"          address_full as string,",
+						"          address_state as string,",
+						"          store_phone as long,",
+						"          store_email as string,",
+						"          business_hours_openi as string,",
+						"          business_hours_closi as string,",
+						"          averageRating as float,",
+						"          totalReviews as long,",
+						"          pincode as long",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source1",
+						"source1 select(mapColumn(",
+						"          address_state,",
+						"          averageRating",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 aggregate(groupBy(address_state),",
+						"     averageRating = iif(isNull(avg(averageRating)), 0.0, toFloat(avg(averageRating)))) ~> aggregate1",
+						"aggregate1 filter(address_state!=\"Tamil�Nadu\") ~> filter1",
+						"filter1 sort(asc(averageRating, true)) ~> sort1",
+						"sort1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/db_stores_sql')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sateStoreAvgRating_sql')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/df_brandSales')]",
@@ -3538,363 +4175,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/ds_monthly_rev')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSqlTable7')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_master')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "data_conv",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "data_conv",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "pl_brand_sales",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "data_conv",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_brand_sales",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "pl_mostStock_category",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "data_conv",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_mostStock_category",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "pl_worst_products",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "pl_brand_sales",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_worst_products",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "pl_purchased_category",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "pl_mostStock_category",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_purchased_category",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "pl_top_selling_product",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "pl_worst_products",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_top_selling_product",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "pl_top_performing_customer",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "data_conv",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_top_performing_customer",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "pl_lenskart_offers",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "pl_purchased_category",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_lenskart_offers",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "top_performing_store_rating",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "data_conv",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "top_performing_store_rating",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "pl_city_sales",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "top_performing_store_rating",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_city_sales",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "pl_customer_denisty",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "pl_city_sales",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_customer_denisty",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "pl_generate_monthly_revenues",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "pl_top_performing_customer",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_generate_monthly_revenues",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "pl_yearly_sales",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "pl_generate_monthly_revenues",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_yearly_sales",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "pl_top_performing_customer1",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "pl_customer_denisty",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_top_performing_customer",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/data_conv')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_brand_sales')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_mostStock_category')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_worst_products')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_purchased_category')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_top_selling_product')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_top_performing_customer')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_lenskart_offers')]",
-				"[concat(variables('factoryId'), '/pipelines/top_performing_store_rating')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_city_sales')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_customer_denisty')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_generate_monthly_revenues')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_yearly_sales')]"
 			]
 		}
 	]

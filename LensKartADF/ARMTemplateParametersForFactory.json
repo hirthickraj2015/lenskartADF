@@ -13,6 +13,15 @@
 		},
 		"ls_dataset_connectionString": {
 			"value": ""
+		},
+		"ls_http_lenskart_password": {
+			"value": ""
+		},
+		"ls_http_lenskart_properties_typeProperties_url": {
+			"value": "https://raw.githubusercontent.com/"
+		},
+		"ls_http_lenskart_properties_typeProperties_userName": {
+			"value": "ls_mongo_expensetracker"
 		}
 	}
 }
