@@ -339,6 +339,29 @@
 					},
 					"waitOnCompletion": true
 				}
+			},
+			{
+				"name": "pl_wishlist",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "pl_lenskart_offers",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_wishlist",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
 			}
 		],
 		"annotations": []
