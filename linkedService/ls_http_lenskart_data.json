@@ -1,0 +1,15 @@
+{
+	"name": "ls_http_lenskart_data",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "https://github.com/",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Basic",
+			"userName": "ls_mongo_expensetracker",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDIyMTE2REIwLTBCNzQtNDE1My05RERCLTRCNTZCN0NBOUU4Q18zMzY3MWVkOS00MzljLTQ5NmItYjA2MS01MzgwZWRjMTdjNmMiDQp9"
+		}
+	}
+}
